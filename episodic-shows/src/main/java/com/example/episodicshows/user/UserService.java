@@ -2,6 +2,10 @@ package com.example.episodicshows.user;
 
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
+import static java.util.Arrays.asList;
+
 @Service
 public class UserService {
     private final UserRepository repo;
@@ -12,5 +16,9 @@ public class UserService {
 
     public User createUser(User user) {
         return repo.save(user);
+    }
+
+    public Iterable<User> getUsers() {
+        return repo.findAll();
     }
 }
