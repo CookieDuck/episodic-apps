@@ -1,4 +1,4 @@
-CREATE TABLE `users` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT,
-  `email` VARCHAR(256) NOT NULL,
-  PRIMARY KEY (`id`));
+create table users (
+id bigint not null auto_increment primary key,
+email varchar(255) not null unique
+);
