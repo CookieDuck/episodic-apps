@@ -16,6 +16,8 @@ public class User {
 
     private String email;
 
+    public User() {}
+
     @JsonCreator
     public User(@JsonProperty(value = "email") String email) {
         this.email = email;

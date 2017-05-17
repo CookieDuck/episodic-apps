@@ -19,6 +19,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -41,6 +42,7 @@ public class UserControllerTest {
     @Rollback
     public void testCreateUser() throws Exception {
         String expectedEmail = "Create@me.com";
+        final long initialCount = userRepository.count();
 
         Map<String, Object> map = new HashMap<>();
         map.put("email", expectedEmail);
@@ -54,6 +56,7 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").isNumber())
                 .andExpect(jsonPath("$.email", is(expectedEmail)));
+        assertEquals(initialCount + 1, userRepository.count());
     }
 
     @Test
