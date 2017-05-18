@@ -46,9 +46,9 @@ public class UserServiceTest {
     public void testServiceReturnsUsers() {
         when(repo.findAll()).thenReturn(asList(new User("1@1.com"), new User("2@2.com")));
 
-        Iterable<User> users = service.getUsers();
+        List<User> users = service.getUsers();
 
-        List<String> emails = StreamSupport.stream(users.spliterator(), false).map(User::getEmail).collect(Collectors.toList());
+        List<String> emails = users.stream().map(User::getEmail).collect(Collectors.toList());
 
         assertEquals(2, emails.size());
         assertTrue(emails.containsAll(asList("1@1.com", "2@2.com")));

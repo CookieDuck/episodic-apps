@@ -49,9 +49,9 @@ public class ShowServiceTest {
     public void testServiceReturnsUsers() {
         when(showRepo.findAll()).thenReturn(asList(new Show("Show uno"), new Show("Show dos")));
 
-        Iterable<Show> shows = service.getShows();
+        List<Show> shows = service.getShows();
 
-        List<String> names = StreamSupport.stream(shows.spliterator(), false).map(Show::getName).collect(Collectors.toList());
+        List<String> names = shows.stream().map(Show::getName).collect(Collectors.toList());
 
         assertEquals(2, names.size());
         assertTrue(names.containsAll(asList("Show uno", "Show dos")));
@@ -95,5 +95,33 @@ public class ShowServiceTest {
         verify(showRepo).findOne(anyLong());
         verifyNoMoreInteractions(showRepo);
         verifyZeroInteractions(episodeRepo);
+    }
+
+    @Test
+    public void testServiceReturnsEmptyForMissingShow() {
+        when(episodeRepo.findAllByShowId(anyLong())).thenReturn(null);
+
+        List<Episode> episodes = service.getEpisodesForShow(404L);
+
+        assertTrue(episodes.isEmpty());
+        verify(episodeRepo).findAllByShowId(anyLong());
+        verifyNoMoreInteractions(episodeRepo);
+        verifyZeroInteractions(showRepo);
+    }
+
+    @Test
+    public void testServiceReturnsEpisodesForShow() {
+        when(episodeRepo.findAllByShowId(anyLong())).thenReturn(asList(new Episode(1, 2), new Episode(3, 4)));
+
+        List<Episode> episodes = service.getEpisodesForShow(1L);
+        List<Integer> seasons = episodes.stream().map(Episode::getSeasonNumber).collect(Collectors.toList());
+        List<Integer> episodeNumbers = episodes.stream().map(Episode::getEpisodeNumber).collect(Collectors.toList());
+
+        assertEquals(2, episodes.size());
+        assertTrue(seasons.containsAll(asList(1, 3)));
+        assertTrue(episodeNumbers.containsAll(asList(2, 4)));
+        verify(episodeRepo).findAllByShowId(anyLong());
+        verifyNoMoreInteractions(episodeRepo);
+        verifyZeroInteractions(showRepo);
     }
 }

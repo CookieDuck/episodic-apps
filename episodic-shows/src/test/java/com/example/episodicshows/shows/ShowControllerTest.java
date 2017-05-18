@@ -127,4 +127,38 @@ public class ShowControllerTest {
                 .andExpect(status().isBadRequest());
         assertEquals(initialCount, episodeRepository.count());
     }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void testGetEpisodesForExistingShow() throws Exception {
+        Show show = showRepository.save(new Show("The Simpsons"));
+        Episode s1e1 = new Episode(1, 1);
+        s1e1.setShowId(show.getId());
+        Episode s1e2 = new Episode(1, 2);
+        s1e2.setShowId(show.getId());
+        episodeRepository.save(s1e1);
+        episodeRepository.save(s1e2);
+
+        mvc.perform(get("/shows/" + show.getId() + "/episodes")
+                .accept(MediaType.APPLICATION_JSON))
+
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$..id").exists())
+                .andExpect(jsonPath("$..seasonNumber", containsInAnyOrder(1, 1)))
+                .andExpect(jsonPath("$..episodeNumber", containsInAnyOrder(1, 2)))
+                .andExpect(jsonPath("$..title", containsInAnyOrder("S1 E1", "S1 E2")));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void testGetEpisodesForMissingShowReturnsEmptyList() throws Exception {
+        mvc.perform(get("/shows/999/episodes")
+                .accept(MediaType.APPLICATION_JSON))
+
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(0)));
+    }
 }

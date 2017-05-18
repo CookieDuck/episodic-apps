@@ -2,4 +2,8 @@ package com.example.episodicshows.shows;
 
 import org.springframework.data.repository.CrudRepository;
 
-public interface EpisodeRepository extends CrudRepository<Episode, Long> {}
+import java.util.List;
+
+public interface EpisodeRepository extends CrudRepository<Episode, Long> {
+    List<Episode> findAllByShowId(Long showId);
+}

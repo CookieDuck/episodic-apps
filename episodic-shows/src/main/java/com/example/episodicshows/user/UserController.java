@@ -2,6 +2,8 @@ package com.example.episodicshows.user;
 
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -17,7 +19,7 @@ public class UserController {
     }
 
     @GetMapping
-    public Iterable<User> getUsers() {
+    public List<User> getUsers() {
         return service.getUsers();
     }
 }

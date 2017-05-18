@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/shows")
 public class ShowController {
@@ -21,7 +23,7 @@ public class ShowController {
     }
 
     @GetMapping
-    public Iterable<Show> getShows() {
+    public List<Show> getShows() {
         return service.getShows();
     }
 
@@ -34,5 +36,10 @@ public class ShowController {
         }
         EpisodeModel model = MapperUtils.map(created);
         return new ResponseEntity(model, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/episodes")
+    public List<EpisodeModel> getEpisodesForShow(@PathVariable(value = "id") Long showId) {
+        return MapperUtils.map(service.getEpisodesForShow(showId));
     }
 }

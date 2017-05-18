@@ -1,6 +1,10 @@
 package com.example.episodicshows.shows;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.Collections;
+import java.util.List;
 
 @Service
 public class ShowService {
@@ -16,7 +20,7 @@ public class ShowService {
         return showRepo.save(show);
     }
 
-    public Iterable<Show> getShows() {
+    public List<Show> getShows() {
         return showRepo.findAll();
     }
 
@@ -27,5 +31,10 @@ public class ShowService {
         }
         episode.setShowId(show.getId());
         return episodeRepo.save(episode);
+    }
+
+    public List<Episode> getEpisodesForShow(Long showId) {
+        List<Episode> episodes = episodeRepo.findAllByShowId(showId);
+        return CollectionUtils.isEmpty(episodes) ? Collections.emptyList() : episodes;
     }
 }
