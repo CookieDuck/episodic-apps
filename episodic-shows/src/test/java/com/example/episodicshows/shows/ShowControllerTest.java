@@ -22,6 +22,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -33,6 +34,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ShowControllerTest {
     @Autowired
     ShowRepository showRepository;
+
+    @Autowired
+    EpisodeRepository episodeRepository;
 
     @Autowired
     MockMvc mvc;
@@ -64,7 +68,7 @@ public class ShowControllerTest {
     @Test
     @Transactional
     @Rollback
-    public void testGetUsers() throws Exception {
+    public void testGetShows() throws Exception {
         showRepository.save(asList(new Show("South Park"), new Show("The Simpsons")));
 
         mvc.perform(get("/shows")
@@ -74,5 +78,53 @@ public class ShowControllerTest {
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$..id").exists())
                 .andExpect(jsonPath("$..name", containsInAnyOrder("South Park", "The Simpsons")));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void testCreateEpisode() throws Exception {
+        Show show = showRepository.save(new Show("The IT Crowd"));
+        final long initialCount = episodeRepository.count();
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("seasonNumber", 4);
+        map.put("episodeNumber", 2);
+        String requestPayload = mapper.writeValueAsString(map);
+
+
+        mvc.perform(post("/shows/" + show.getId().intValue() + "/episodes")
+                .content(requestPayload)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(show.getId().intValue())))
+                .andExpect(jsonPath("$.seasonNumber", is(4)))
+                .andExpect(jsonPath("$.episodeNumber", is(2)))
+                .andExpect(jsonPath("$.title", is("S4 E2")));
+        assertEquals(initialCount + 1, episodeRepository.count());
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void testCreateEpisodeFailsOnMissingShow() throws Exception {
+        assertNull("Should not have ANY data", showRepository.findOne(999L));
+        final long initialCount = episodeRepository.count();
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("seasonNumber", 4);
+        map.put("episodeNumber", 2);
+        String requestPayload = mapper.writeValueAsString(map);
+
+
+        mvc.perform(post("/shows/" + 999 + "/episodes")
+                .content(requestPayload)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+
+                .andExpect(status().isBadRequest());
+        assertEquals(initialCount, episodeRepository.count());
     }
 }
