@@ -13,4 +13,8 @@ public class ShowService {
     public Show createShow(Show show) {
         return repo.save(show);
     }
+
+    public Iterable<Show> getShows() {
+        return repo.findAll();
+    }
 }

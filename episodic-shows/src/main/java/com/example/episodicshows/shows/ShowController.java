@@ -1,10 +1,9 @@
 package com.example.episodicshows.shows;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/shows")
 public class ShowController {
     private final ShowService service;
 
@@ -12,8 +11,13 @@ public class ShowController {
         this.service = service;
     }
 
-    @PostMapping("/shows")
+    @PostMapping
     public Show createShow(@RequestBody Show show) {
         return service.createShow(show);
+    }
+
+    @GetMapping
+    public Iterable<Show> getShows() {
+        return service.getShows();
     }
 }

@@ -1,5 +1,6 @@
 package com.example.episodicshows.shows;
 
+import com.example.episodicshows.user.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,8 +17,12 @@ import javax.transaction.Transactional;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.util.Arrays.asList;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -54,5 +59,20 @@ public class ShowControllerTest {
                 .andExpect(jsonPath("$.id").isNumber())
                 .andExpect(jsonPath("$.name", is(expectedName)));
         assertEquals(initialCount + 1, showRepository.count());
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    public void testGetUsers() throws Exception {
+        showRepository.save(asList(new Show("South Park"), new Show("The Simpsons")));
+
+        mvc.perform(get("/shows")
+                .accept(MediaType.APPLICATION_JSON))
+
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$..id").exists())
+                .andExpect(jsonPath("$..name", containsInAnyOrder("South Park", "The Simpsons")));
     }
 }
