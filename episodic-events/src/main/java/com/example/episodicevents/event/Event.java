@@ -1,11 +1,8 @@
 package com.example.episodicevents.event;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 
@@ -16,7 +13,9 @@ import java.util.Map;
 @Setter
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = PlayEvent.class, name = "play")
+        @JsonSubTypes.Type(value = PlayEvent.class, name = "play"),
+        @JsonSubTypes.Type(value = PauseEvent.class, name = "pause"),
+        @JsonSubTypes.Type(value = FastForwardEvent.class, name = "fastForward")
 })
 public abstract class Event {
     @Id

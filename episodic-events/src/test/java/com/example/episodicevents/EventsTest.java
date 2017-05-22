@@ -1,9 +1,8 @@
 package com.example.episodicevents;
 
-import com.example.episodicevents.event.Event;
-import com.example.episodicevents.event.EventRepository;
-import com.example.episodicevents.event.PlayEvent;
+import com.example.episodicevents.event.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,27 +39,33 @@ public class EventsTest {
 
     @Autowired
     ObjectMapper mapper;
-    //TODO deleteAll between each test?
+
+    @Before
+    public void init() {
+        repo.deleteAll();
+    }
 
     @Test
     public void createPlayEvent() throws Exception {
-        Event playEvent = makePlayEvent(123);
-        String postRequest = mapper.writeValueAsString(playEvent);
-        mvc.perform(post("/")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(postRequest))
-                .andExpect(status().isOk());
+        Event event = makePlayEvent(123);
+        doPost(event);
+    }
+
+    @Test
+    public void createPauseEvent() throws Exception {
+        Event event = makePauseEvent(123);
+        doPost(event);
+    }
+
+    @Test
+    public void createFastForwardEvent() throws Exception {
+        Event event = makeFastForwardEvent(12, 34, 56);
+        doPost(event);
     }
 
     @Test
     public void getReturnsRecent() throws Exception {
-        repo.deleteAll();
-        Event playEvent = makePlayEvent(123);
-        String postRequest = mapper.writeValueAsString(playEvent);
-        mvc.perform(post("/")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(postRequest))
-                .andExpect(status().isOk());
+        doPost(makePlayEvent(123));
 
         mvc.perform(get("/recent").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -74,7 +79,7 @@ public class EventsTest {
                 .andExpect(jsonPath("$[0].data.offset", is(123)));
     }
 
-    private PlayEvent makePlayEvent(int offset) {
+    private Event makePlayEvent(int offset) {
         Long userId = DEFAULT_USER_ID;
         Long showId = DEFAULT_SHOW_ID;
         Long episodeId = DEFAULT_EPISODE_ID;
@@ -82,5 +87,34 @@ public class EventsTest {
         Map<String, Object> dataPayload = new HashMap<>();
         dataPayload.put("offset", offset);
         return new PlayEvent(userId, showId, episodeId, createdAt, dataPayload);
+    }
+
+    private Event makePauseEvent(int offset) {
+        Long userId = DEFAULT_USER_ID;
+        Long showId = DEFAULT_SHOW_ID;
+        Long episodeId = DEFAULT_EPISODE_ID;
+        LocalDateTime createdAt = LocalDateTime.now();
+        Map<String, Object> dataPayload = new HashMap<>();
+        dataPayload.put("offset", offset);
+        return new PauseEvent(userId, showId, episodeId, createdAt, dataPayload);
+    }
+
+    private Event makeFastForwardEvent(int startOffset, int endOffset, double speed) {
+        Long userId = DEFAULT_USER_ID;
+        Long showId = DEFAULT_SHOW_ID;
+        Long episodeId = DEFAULT_EPISODE_ID;
+        LocalDateTime createdAt = LocalDateTime.now();
+        Map<String, Object> dataPayload = new HashMap<>();
+        dataPayload.put("startOffset", startOffset);
+        dataPayload.put("endOffset", endOffset);
+        dataPayload.put("speed", speed);
+        return new FastForwardEvent(userId, showId, episodeId, createdAt, dataPayload);
+    }
+
+    private void doPost(Event event) throws Exception {
+        mvc.perform(post("/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(event)))
+                .andExpect(status().isOk());
     }
 }
