@@ -10,17 +10,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 @JsonIgnoreProperties(value = {"type", "data"}, allowGetters = true)
-public class FastForwardEvent extends Event {
+public class RewindEvent extends Event {
     private final int startOffset;
     private final int endOffset;
     private final double speed;
 
     @JsonCreator
-    public FastForwardEvent(@JsonProperty(value = "userId") Long userId,
-                      @JsonProperty(value = "showId") Long showId,
-                      @JsonProperty(value = "episodeId") Long episodeId,
-                      @JsonProperty(value = "createdAt") LocalDateTime createdAt,
-                      @JsonProperty(value = "data") Map<String, Object> data) {
+    public RewindEvent(@JsonProperty(value = "userId") Long userId,
+                            @JsonProperty(value = "showId") Long showId,
+                            @JsonProperty(value = "episodeId") Long episodeId,
+                            @JsonProperty(value = "createdAt") LocalDateTime createdAt,
+                            @JsonProperty(value = "data") Map<String, Object> data) {
         super(userId, showId, episodeId, createdAt);
         this.startOffset = data != null ? (int) data.get("startOffset") : -1;
         this.endOffset = data != null ? (int) data.get("endOffset") : -1;
@@ -29,7 +29,7 @@ public class FastForwardEvent extends Event {
 
     @Override
     public String getType() {
-        return "fastForward";
+        return "rewind";
     }
 
     @JsonGetter("data")

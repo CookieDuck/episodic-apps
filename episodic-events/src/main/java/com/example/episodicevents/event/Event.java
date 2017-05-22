@@ -15,7 +15,10 @@ import java.util.Map;
 @JsonSubTypes({
         @JsonSubTypes.Type(value = PlayEvent.class, name = "play"),
         @JsonSubTypes.Type(value = PauseEvent.class, name = "pause"),
-        @JsonSubTypes.Type(value = FastForwardEvent.class, name = "fastForward")
+        @JsonSubTypes.Type(value = FastForwardEvent.class, name = "fastForward"),
+        @JsonSubTypes.Type(value = ProgressEvent.class, name = "progress"),
+        @JsonSubTypes.Type(value = ScrubEvent.class, name = "scrub"),
+        @JsonSubTypes.Type(value = RewindEvent.class, name = "rewind")
 })
 public abstract class Event {
     @Id
