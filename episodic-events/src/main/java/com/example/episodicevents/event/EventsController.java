@@ -2,10 +2,8 @@ package com.example.episodicevents.event;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Sort;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,10 +21,11 @@ public class EventsController {
     }
 
     @GetMapping("/recent")
-    public List<Event> getRecent() {
-        int page = 0;
-        int size = 20;
-        Pageable query = new PageRequest(page, size);
+    public List<Event> getRecent(
+            @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(value = "pageSize", required = false, defaultValue = "20") int pageSize
+    ) {
+        Pageable query = new PageRequest(page, pageSize, Sort.Direction.DESC, "createdAt");
         return repo.findAll(query).getContent();
     }
 }
