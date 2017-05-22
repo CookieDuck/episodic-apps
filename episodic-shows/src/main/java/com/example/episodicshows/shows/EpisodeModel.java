@@ -2,9 +2,9 @@ package com.example.episodicshows.shows;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
+import lombok.Value;
 
-@Getter
+@Value
 public final class EpisodeModel {
     private final Long id;
     private final int seasonNumber;

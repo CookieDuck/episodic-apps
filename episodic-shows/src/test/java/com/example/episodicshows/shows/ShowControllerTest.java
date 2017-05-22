@@ -1,13 +1,11 @@
 package com.example.episodicshows.shows;
 
-import com.example.episodicshows.user.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -99,7 +97,7 @@ public class ShowControllerTest {
                 .accept(MediaType.APPLICATION_JSON))
 
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(show.getId().intValue())))
+                .andExpect(jsonPath("$.id").isNumber())
                 .andExpect(jsonPath("$.seasonNumber", is(4)))
                 .andExpect(jsonPath("$.episodeNumber", is(2)))
                 .andExpect(jsonPath("$.title", is("S4 E2")));
