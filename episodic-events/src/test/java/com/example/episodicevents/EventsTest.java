@@ -1,13 +1,17 @@
 package com.example.episodicevents;
 
 import com.example.episodicevents.event.*;
+import com.example.episodicevents.publisher.ProgressMessage;
+import com.example.episodicevents.publisher.ProgressService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -16,9 +20,9 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -41,9 +45,30 @@ public class EventsTest extends BaseTest {
     @Autowired
     ObjectMapper mapper;
 
+    @MockBean
+    ProgressService progressService;
+
     @Before
     public void init() {
         repo.deleteAll();
+    }
+
+    @Test
+    public void progressEventGetsPublishedToQueue() throws Exception {
+        Long expectedUserId = 123L;
+        Long expectedEpisodeId = 456L;
+        LocalDateTime expectedCreatedAt = LocalDateTime.now();
+        int expectedOffset = 789;
+        Event event = makeProgressEvent(expectedUserId, expectedEpisodeId, expectedCreatedAt, expectedOffset);
+        ArgumentCaptor<ProgressMessage> captor = ArgumentCaptor.forClass(ProgressMessage.class);
+
+        doPost(event);
+
+        verify(progressService).sendMessage(captor.capture());
+        assertEquals(expectedUserId, captor.getValue().getUserId());
+        assertEquals(expectedEpisodeId, captor.getValue().getEpisodeId());
+        assertEquals(expectedCreatedAt, captor.getValue().getCreatedAt());
+        assertEquals(expectedOffset, captor.getValue().getOffset());
     }
 
     @Test
@@ -187,11 +212,13 @@ public class EventsTest extends BaseTest {
         dataPayload.put("offset", offset);
         return new PauseEvent(userId, showId, episodeId, createdAt, dataPayload);
     }
+
     private Event makeProgressEvent(int offset) {
-        Long userId = DEFAULT_USER_ID;
+        return makeProgressEvent(DEFAULT_USER_ID, DEFAULT_EPISODE_ID, LocalDateTime.now(), offset);
+    }
+
+    private Event makeProgressEvent(Long userId, Long episodeId, LocalDateTime createdAt, int offset) {
         Long showId = DEFAULT_SHOW_ID;
-        Long episodeId = DEFAULT_EPISODE_ID;
-        LocalDateTime createdAt = LocalDateTime.now();
         Map<String, Object> dataPayload = new HashMap<>();
         dataPayload.put("offset", offset);
         return new ProgressEvent(userId, showId, episodeId, createdAt, dataPayload);
