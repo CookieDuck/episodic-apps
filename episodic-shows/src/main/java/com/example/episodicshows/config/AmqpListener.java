@@ -25,7 +25,7 @@ public class AmqpListener implements RabbitListenerConfigurer {
         this.viewingService = viewingService;
     }
 
-    @RabbitListener(queues = "episodic-progress")
+    @RabbitListener(queues = "${progress-queue}")
     public void receiveMessage(final ProgressMessage message) {
 //        System.out.println("************************************************");
 //        System.out.println("message.getUserId() = " + message.getUserId());
