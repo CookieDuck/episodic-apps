@@ -1,5 +1,6 @@
 package com.example.episodicshows.shows;
 
+import com.example.episodicshows.BaseTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc(secure = false)
-public class ShowControllerTest {
+public class ShowControllerTest extends BaseTest {
     @Autowired
     ShowRepository showRepository;
 

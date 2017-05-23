@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc(secure = false)
-public class EventsTest {
+public class EventsTest extends BaseTest {
     private static final Long DEFAULT_USER_ID = 1L;
     private static final Long DEFAULT_SHOW_ID = 2L;
     private static final Long DEFAULT_EPISODE_ID = 3L;

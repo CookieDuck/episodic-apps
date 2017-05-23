@@ -1,5 +1,6 @@
 package com.example.episodicshows.shows;
 
+import com.example.episodicshows.BaseTest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
