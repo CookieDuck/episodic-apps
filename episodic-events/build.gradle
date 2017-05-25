@@ -23,12 +23,19 @@ repositories {
 	maven { url "http://repo.spring.io/snapshot" }
 }
 
+ext {
+	springCloudServicesVersion = '1.4.1.RELEASE'
+	springCloudVersion = 'Dalston.RELEASE'
+}
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-actuator')
 	compile('org.springframework.boot:spring-boot-starter-data-mongodb')
 	compile('org.springframework.boot:spring-boot-starter-security')
 	compile('org.springframework.boot:spring-boot-starter-web')
+	compile('org.springframework.cloud:spring-cloud-starter-zuul')
+	compile('io.pivotal.spring.cloud:spring-cloud-services-starter-config-client')
+	compile('io.pivotal.spring.cloud:spring-cloud-services-starter-service-registry')
 	compile('com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.9.0.pr3')
 	compile('org.springframework.boot:spring-boot-starter-amqp')
 	compile('org.springframework.amqp:spring-rabbit-junit:1.7.2.RELEASE')
@@ -38,4 +45,11 @@ dependencies {
 	compileOnly('org.projectlombok:lombok')
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "io.pivotal.spring.cloud:spring-cloud-services-dependencies:${springCloudServicesVersion}"
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
 }
